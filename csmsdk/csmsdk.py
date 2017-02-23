@@ -9,6 +9,8 @@ DEBUG = False
 
 class LoginException(BaseException):
     pass
+class CsmException(BaseException):
+    pass
 
 class Csm(object):
 
@@ -22,6 +24,7 @@ class Csm(object):
         self.cookie =''
 
     def login(self):
+        ''' Method to login'''
         path = "/nbi/login"
         payload = ("""<?xml version="1.0" encoding="UTF-8"?>
         <csm:loginRequest xmlns:csm="csm">
@@ -55,6 +58,7 @@ class Csm(object):
 
 
     def logout(self):
+        ''' Method to logout'''
         path = "/nbi/logout"
         payload = """<?xml version="1.0" encoding="UTF-8"?>
         <csm:logoutRequest xmlns:csm="csm">
@@ -69,6 +73,22 @@ class Csm(object):
             return(response)
         else:
             return("{} successfully logged out".format(self.username))
+
+    def showrun(self):
+        '''Method to get the running config of the device by context name'''
+        path = "/nbi/configservice/getDeviceConfigByName"
+        payload = ("""<?xml version="1.0" encoding="UTF-8"?>
+        <n:deviceConfigByNameRequest xmlns:n="csm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <protVersion>1.0</protVersion>
+        <reqId>123</reqId>
+        <name>{}</name>
+        </n:deviceConfigByNameRequest>""").format(self.context)
+        headers = {'Content-type': 'text/xml'}
+        self.session = requests.Session()
+        response = self.session.post(url=self.csm + path, data=payload,
+                                     headers=headers, verify=False)
+        if response.status_code != 200:
+            raise CsmException
 
     def showacl(self, aclname='None'):
         path = "/nbi/configservice/getPolicyConfigByName"

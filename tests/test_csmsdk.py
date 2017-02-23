@@ -2,9 +2,9 @@
 import pytest
 import csmsdk.csmsdk as csm
 #GLOBALS
-URL = "https://ccsmghoh01.gis.corp.ge.com"
-UNAME = "sec_automation"
-PWORD = "fwautomation"
+URL = "https://csm.csm"
+UNAME = "<uname>"
+PWORD = "<pword>"
 CONTEXT = "DEVfvMUSashdc01-1401"
 
 def test_login():
