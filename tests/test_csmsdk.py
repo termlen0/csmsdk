@@ -6,6 +6,8 @@ URL = "https://ccsmghoh01.gis.corp.ge.com"
 UNAME = "sec_automation"
 PWORD = "fwautomation"
 CONTEXT = "DEVfvMUSashdc01-1401"
+LOGDIR = "/tmp/csmsdklogs/"
+CONFIGDIR = "/tmp/csmsdkconf/"
 
 def test_login():
     ''' Validate that the user can login and logout successfully'''
@@ -24,7 +26,15 @@ def test_acllist():
 
     resp = mycsm.logout()
     assert "logged out" in resp
-    pass
+
+def test_getconfig():
+    """Given the context, get the running config"""
+    mycsm = csm.Csm(url=URL, username=UNAME, password=PWORD,
+                    context_name=CONTEXT)
+    resp = mycsm.login()
+    running_config = mycsm.showrun(confpath=CONFIGDIR)
+    mycsm.logout()
+
 
 def test_acladd():
     '''Given the access-list name, insert an ACE to the list'''
