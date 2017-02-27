@@ -48,8 +48,18 @@ def test_getpolicyobj():
     mycsm = csm.Csm(url=URL, username=UNAME, password=PWORD, logdir=LOGDIR,
                     context_name=CONTEXT)
     mycsm.login()
-    xml_resp = mycsm.getpolicyobj('00000000-0000-0000-0000-017179872090','test')
-    assert 0
+    # GID '00000000-0000-0000-0000-017179872090' is a network policy object
+    # GID '00000000-0000-0000-0000-017179872078' is a network object
+    # GID '00000000-0000-0000-0000-000000000211' is an interface Role object
+    gid1 = '00000000-0000-0000-0000-017179872090'
+    gid2 = '00000000-0000-0000-0000-017179872078'
+    gid3 = '00000000-0000-0000-0000-000000000211'
+    # Get a single GID
+    xml_resp = mycsm.getpolicyobj('00000000-0000-0000-0000-017179872090')
+    assert "NetworkPolicyObject" in xml_resp
+    # Bulk get all 3 GIDs
+    xml_bulk_resp = mycsm.getpolicyobj(gid1, gid2, gid3)
+    assert "internal" in xml_bulk_resp #The interface GID has the name internal
     mycsm.logout()
 
 

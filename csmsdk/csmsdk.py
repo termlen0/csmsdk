@@ -224,20 +224,16 @@ class Csm(object):
         """Given the gid, return the details of the policy object.
         It is up to the endpoint consumer to parse it"""
         # Use Jinja2 to generate the xml payload
-        # Set up the directory to find the template
-        template_loader = FileSystemLoader(searchpath='templates')
+        # Set up the directory, where to find the template
+        template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+        template_loader = FileSystemLoader(template_dir)
         template_env = Environment(loader=template_loader)
         # Get the jinja2 xml template
         xml_template = template_env.get_template('getpolicyobj.j2')
         # Generate the payload
         arg_dict = {'gids': args}
         payload = xml_template.render(arg_dict)
-        assert 0
         path = "/nbi/configservice/getPolicyObjectByGID"
-        payload = ("""<?xml version="1.0" encoding="UTF-8"?>
-        <n:getPolicyObjectByGID xmlns:n="csm">
-        <gid>{}</gid>
-        </n:getPolicyObjectByGID>""").format(gid)
         logging.info("INFO: Collecting the object details...")
         headers = {'Content-type': 'text/xml'}
         logging.debug("DEBUG: {} cookie, logged in".format(self.cookie))
@@ -254,7 +250,7 @@ class Csm(object):
             try:
                 root = etree.fromstring(response.text)
                 logging.info(
-                    "INFO:Entire Details for GID {} collected..".format(gid))
+                    "INFO:Entire Details for GIDs collected..")
                 return etree.tostring(root.find('./policyObject'),
                                           encoding="unicode")
             except BaseException as e:
