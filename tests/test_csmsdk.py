@@ -42,9 +42,9 @@ def test_getpolicyobj():
     """Given the GID of a policy object, get its details"""
     # The GID of the object is obtained by parsing the output of the showpolicy
     # for instance.
-    # The idea behind this method, is to provide a means to validate the current
-    # values of policy objects; can be used for validation, before adding a new
-    # policy
+    # The idea behind this method, is to provide a means to validate the
+    # current values of policy objects; can be used for validation, before
+    # adding a new policy
     mycsm = csm.Csm(url=URL, username=UNAME, password=PWORD, logdir=LOGDIR,
                     context_name=CONTEXT)
     mycsm.login()
@@ -59,13 +59,26 @@ def test_getpolicyobj():
     assert "NetworkPolicyObject" in xml_resp
     # Bulk get all 3 GIDs
     xml_bulk_resp = mycsm.getpolicyobj(gid1, gid2, gid3)
-    assert "internal" in xml_bulk_resp #The interface GID has the name internal
+    assert "internal" in xml_bulk_resp #The intf GID has the name internal
+    assert 0
     mycsm.logout()
 
 
-def test_acladd():
-    '''Given the access-list name, insert an ACE to the list'''
-    pass
+def test_addobject():
+    """Given the object details, add the object"""
+    mycsm = csm.Csm(url=URL, username=UNAME, password=PWORD, logdir=LOGDIR,
+                    context_name=CONTEXT)
+    mycsm.login()
+    resp = mycsm.addobject(name='netobj',
+                               type='network', data='10.0.0.0/24')
+    #assert network object has been created
+    resp = mycsm.addobject(name='serviceobj',
+                           type='service', data='tcp')
+    #assert service object has been created
+    resp = mycsm.addobject(name='portobj',
+                           type='portlist', data='8089')
+    #assert portlist object has been created
+    mycsm.logout()
 
 
 def test_aclremove():

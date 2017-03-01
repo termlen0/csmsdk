@@ -85,7 +85,6 @@ class Csm(object):
                 "INFO: {} successfully logged out..".format(self.username))
             return("{} successfully logged out".format(self.username))
 
-
     def showrun(self, confpath="/tmp"):
         '''Method to get the running config of the device by context name'''
         # Check whether the config backup dir exists - Create if not
@@ -219,7 +218,6 @@ class Csm(object):
                 self.logout()
                 logging.error("ERROR: Unable to retrieve the policy")
 
-
     def getpolicyobj(self, *args):
         """Given the gid, return the details of the policy object.
         It is up to the endpoint consumer to parse it"""
@@ -251,9 +249,44 @@ class Csm(object):
                 root = etree.fromstring(response.text)
                 logging.info(
                     "INFO:Entire Details for GIDs collected..")
-                return etree.tostring(root.find('./policyObject'),
-                                          encoding="unicode")
+                return etree.tostring(root.find(
+                    './policyObject'), encoding="unicode")
             except BaseException as e:
                 self.logout()
                 logging.error("ERROR: Unable to collect the policy details..")
                 logging.error(e)
+
+    def addobject(self, name='None',type='None',data='None'):
+        """Add a firewall object. Currently only supporting:
+        1. Network (ipv4 IPs and subnets)
+        2. Service (TCP/UDP)
+        3. PortList
+        """
+        # STEP 1: Create a CSM session
+
+
+        # STEP 2: Add the object
+        # STEP 3: Submit the CSM session
+
+        # Check whether the config backup dir exists - Create if not
+        os.makedirs(confpath, exist_ok=True)
+        config_file = confpath + self.context
+        # Execute the API call
+        path = "/nbi/configservice/getDeviceConfigByName"
+        payload = ("""<?xml version="1.0" encoding="UTF-8"?>
+        <n:deviceConfigByNameRequest xmlns:n="csm">
+        <protVersion>1.0</protVersion>
+        <reqId>123</reqId>
+        <name>{}</name>
+        </n:deviceConfigByNameRequest> """).format(self.context)
+        headers = {'Content-type': 'text/xml'}
+        logging.debug("DEBUG: {} cookie, logged in".format(self.cookie))
+        response = self.session.post(url=self.csm + path, data=payload,
+                                     headers=headers, verify=False)
+        if response.status_code != 200:
+            logging.debug("DEBUG: {} \n".format(response.text))
+            logging.debug("DEBUG: session cookie -  {} ".format(self.cookie))
+            self.logout()
+            raise CsmException(
+                "Error retriving the config : {}".format(response.status_code))
+        else:
